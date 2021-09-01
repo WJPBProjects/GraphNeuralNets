@@ -1,0 +1,67 @@
+Seed: 3
+ [{'test_loss': 1.03878653049469, 'test_acc': 0.6274999976158142}]
+ 
+Seed: 4
+ [{'test_loss': 1.077176570892334, 'test_acc': 0.6079999804496765}]
+ 
+Seed: 8
+ [{'test_loss': 1.016276478767395, 'test_acc': 0.633899986743927}]
+ 
+Seed: 9
+ [{'test_loss': 1.0345546007156372, 'test_acc': 0.6263999938964844}]
+ 
+Seed: 27
+ [{'test_loss': 1.0706120729446411, 'test_acc': 0.6155999898910522}]
+ 
+END
+80 epochs
+
+for seed in rand_seeds:
+    #re-seed everything
+    pl.seed_everything(seed, workers=True)
+    
+    #setup data
+    mnist_data = MNISTDataModule(data_dir = './MNIST_data/',
+                                 batch_size = 40
+                                )
+    
+    #setup model
+    kernel_size = 5
+
+    model = ChebNet(hidden_channels = 64, 
+                num_node_features = 1, 
+                num_classes = 10,
+                k_size = 5,
+                CBS_initial_neighb_distance = 0, 
+                CBS_epochs = 0,
+                starting_own_weight = 1,
+                weight_epochs = 0, 
+                weight_incr = 0
+               )
+
+    
+    checkpoint_callback = ModelCheckpoint(
+        monitor='val_loss',
+        save_top_k=1,
+        mode='min',
+    )
+    
+    
+    #setup trainer
+    callbacks_list = [checkpoint_callback]
+    
+    trainer = pl.Trainer(gpus=1, 
+                     deterministic=True, 
+                     min_epochs = num_epochs,
+                     max_epochs = num_epochs, 
+                     callbacks=callbacks_list
+                    )
+    
+    #fit
+    trainer.fit(model, mnist_data)
+    
+    #test & save
+    test_vals = trainer.test(model = model)
+    
+    with open(results_filename, "a") as file_object:
+        file_object.write(f'Seed: {seed}\n {test_vals}\n \n')
