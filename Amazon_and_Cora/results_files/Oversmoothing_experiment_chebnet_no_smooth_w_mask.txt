@@ -1,0 +1,66 @@
+Seed: 3
+ [{'test_loss': 0.3447970449924469, 'test_acc': 0.903}]
+ 
+Seed: 4
+ [{'test_loss': 0.3004627823829651, 'test_acc': 0.907}]
+ 
+Seed: 8
+ [{'test_loss': 0.3029597997665405, 'test_acc': 0.916}]
+ 
+Seed: 9
+ [{'test_loss': 0.2851417362689972, 'test_acc': 0.919}]
+ 
+Seed: 27
+ [{'test_loss': 0.33028265833854675, 'test_acc': 0.905}]
+ 
+END
+500 epochs
+
+for seed in rand_seeds:
+    #re-seed everything
+    pl.seed_everything(seed, workers=True)
+    
+    #setup data
+    _data = AmazonDataModule(
+        data_dir = './Amazon_data/',
+        batch_size = 1,
+        transform = AddTrainValTestMask("train_rest")
+    )
+    
+    #setup model
+    model = ChebNet_w_mask(hidden_channels = 64, 
+                num_node_features = 767, 
+                num_classes = 10,
+                k_size = 5,
+                CBS_initial_neighb_distance = 0, 
+                CBS_epochs = 0,
+                starting_own_weight = 1,
+                weight_epochs = 0, 
+                weight_incr = 0
+               )
+    
+    checkpoint_callback = ModelCheckpoint(
+        monitor='val_loss',
+        save_top_k=1,
+        mode='min',
+    )
+    
+    
+    #setup trainer
+    callbacks_list = [checkpoint_callback]
+    
+    trainer = pl.Trainer(gpus=1, 
+                     deterministic=True, 
+                     min_epochs = num_epochs,
+                     max_epochs = num_epochs, 
+                     callbacks=callbacks_list
+                    )
+    
+    #fit
+    trainer.fit(model, _data)
+    
+    #test & save
+    test_vals = trainer.test(model = model)
+    
+    with open(results_filename, "a") as file_object:
+        file_object.write(f'Seed: {seed}\n {test_vals}\n \n')

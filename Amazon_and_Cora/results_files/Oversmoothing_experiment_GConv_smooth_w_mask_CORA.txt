@@ -1,0 +1,15 @@
+Seed: 2
+ [{'test_loss': 1.2613061666488647, 'test_acc': 0.922}]
+ 
+Seed: 4
+ [{'test_loss': 1.3478505611419678, 'test_acc': 0.83}]
+ 
+Seed: 7
+ [{'test_loss': 1.382179617881775, 'test_acc': 0.789}]
+ 
+Seed: 9
+ [{'test_loss': 1.3318053483963013, 'test_acc': 0.845}]
+ 
+Seed: 27
+ [{'test_loss': 1.3449923992156982, 'test_acc': 0.833}]
+ 
