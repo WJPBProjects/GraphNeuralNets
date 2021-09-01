@@ -1,6 +1,6 @@
-# UKBB_Mesh
+A repository for investigating graph data with Graph Neural Networks
 
-A repository for investigating UK Biobank (UKBB) data
+Note that this is a limited selection of files and notebooks to demonstrate the work, due to size limitations on the original repo
 
 ## Setup PyTorch using conda
 
